@@ -1,9 +1,17 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
 import { connectToDatabase } from "./libs/db";
+import bodyParser from "body-parser";
+import routes from "./routes";
+
 dotenv.config();
 
 const app: Application = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use("/api", routes);
 
 connectToDatabase()
   .then(() => {
