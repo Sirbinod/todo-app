@@ -23,7 +23,7 @@ const todoSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      unique: true,
+      //   unique: true,
     },
   },
   { timestamps: true }
