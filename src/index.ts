@@ -1,8 +1,10 @@
 import express, { Application } from "express";
+import "express-async-errors";
 import dotenv from "dotenv";
 import { connectToDatabase } from "./libs/db";
 import bodyParser from "body-parser";
 import routes from "./routes";
+import errorHandler from "./middlewares/errorHandler";
 
 dotenv.config();
 
@@ -12,6 +14,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use("/api", routes);
+
+// Use the global error handling middleware
+app.use(errorHandler);
 
 connectToDatabase()
   .then(() => {
