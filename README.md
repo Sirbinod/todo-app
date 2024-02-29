@@ -1,4 +1,4 @@
-## Project Name
+## Todo App
 
 **Develop a todo app**
 
