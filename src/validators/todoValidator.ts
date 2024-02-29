@@ -12,4 +12,11 @@ const TodoValidator = Joi.object({
   status: status.optional(),
 });
 
-export { TodoValidator };
+const TodoUpdateValidator = Joi.object({
+  name: name.optional(),
+  description: description.optional(),
+  dateTime: dateTime.optional(),
+  status: status.optional(),
+});
+
+export { TodoValidator, TodoUpdateValidator };

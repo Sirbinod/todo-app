@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo App</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="container">
+    <h1 class="title">ToDo App</h1>
+    <form id="addTodoForm" action="/api/todo" method="POST">
+        <input type="text" id="name" name="name" placeholder="Name" required>
+        <input type="text" id="description" name="description" placeholder="Short Description" required>
+        <input type="datetime-local" id="dateTime" name="dateTime" required>
+        <button type="submit">Add</button>
+    </form>
+
+    <h2>ToDo List</h2>
+<div class="filter-buttons">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="done">Done</button>
+    <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+</div>
+
+<ul id="todoList">
+    <!-- List items will be dynamically added here -->
+</ul>
+
+    <!-- Script for AJAX -->
+    <script>
+        // Function to load ToDo list using AJAX
+       function loadTodoList(filter = "all") {
+            const query = filter ==="done" || filter==="upcoming" ?  filter :"";
+            fetch(`/api/todo?status=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const todos = data?.data;
+                    const todoList = document.getElementById('todoList');
+                    todoList.innerHTML = ''; // Clear existing list
+                    todos.forEach(todo => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('todo-item');
+                        listItem.dataset.status = todo.done ? 'done' : 'upcoming';
+
+                        listItem.innerHTML = `
+                    <div class="todo-content">
+                        <input type="checkbox" id="${todo._id}" ${todo.status ==="done" ? 'checked' : ''} onchange="updateStatus('${todo._id}', this.checked)">
+                        <label for="${todo._id}" class="todo-text">${todo.name}</label>
+                        <p class="description">${todo.description}</p>
+                    </div>
+                    <div class="todo-actions">
+                        <button class="delete-btn" onclick="deleteTodoItem('${todo._id}')">Delete</button>
+                    </div>
+                `;
+                        todoList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching todos:', error));
+        }
+
+        // Add event listeners to filter buttons
+        document.querySelectorAll('.filter-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const filter = this.dataset.filter;
+                 document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                loadTodoList(filter);
+            });
+        });
+        // Function to update ToDo item status
+        function updateStatus(id, status) {
+            console.log(status, "staaaaaaa")
+            
+            fetch(`/api/todo/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status:status? "done":"upcoming" })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        loadTodoList(); // Reload ToDo list after update
+                    } else {
+                        throw new Error('Failed to update ToDo status');
+                    }
+                })
+                .catch(error => console.error('Error updating status:', error));
+        }
+
+        // Function to delete ToDo item
+        function deleteTodoItem(id) {
+            fetch(`/api/todo/${id}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        loadTodoList(); // Reload ToDo list after delete
+                    } else {
+                        throw new Error('Failed to delete ToDo item');
+                    }
+                })
+                .catch(error => console.error('Error deleting ToDo item:', error));
+        }
+
+        // Add event listener for form submission
+      document.getElementById('addTodoForm').addEventListener('submit', event => {
+            event.preventDefault(); // Prevent default form submission
+            const form = event.target;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: form.method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            })
+                .then(response => {
+                    if (response.ok) {
+                        form.reset(); 
+                        loadTodoList();
+                    } else {
+                        throw new Error('Failed to add ToDo item');
+                    }
+                })
+                .catch(error => console.error('Error adding ToDo item:', error));
+        });
+
+        // Load ToDo list on page load
+        window.onload = loadTodoList;
+    </script> 
+</body>
+
+</html>
