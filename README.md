@@ -14,16 +14,17 @@
 
 ### Installation
 
-1. Clone the repository: `git clone git@github.com:Sirbinod/crypto-notifier-be.git`
+1. Clone the repository: `git clone git@github.com:Sirbinod/todo-app.git`
 2. Install dependencies: `npm install or yarn`
 3. Start the application(local): `npm dev or yarn dev`
 4. Start the application: `npm build & start or yarn build & start`
 
 ###Configuration
 Create a .env file in the root of the project and add env variable 
-example:
-PORT=5000
-MONGODB_URI=your.mongodb.url.here
+
+*example:
+`PORT=5000`
+`MONGODB_URI=your.mongodb.url.here`
 
 ### Technologies Used
 
